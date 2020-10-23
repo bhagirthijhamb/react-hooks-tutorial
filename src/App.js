@@ -10,26 +10,44 @@ function expensiveInititalState(){
 }
 
 function App() {
+  // Do not call Hooks inside loops, conditions or nested functions
   // ***************************************************************************************************
   //            useState Hook
   // ***************************************************************************************************
 
+  // useState() is used to define state. It can have as its first parameter the initial value that it is gonna store. 
+  // eg. useState(10)
+  // or we can have a function that returns the initial value - useState(() => 10). We would want to do this if we have a computation that is very expensive.
+
   // This way it is called only first time, not every single time the component renders.
   // Only have this run on the initial value
   useState(() => expensiveInititalState());
-  // useState returns an array. // const arr = useState(). But no body write like this instead destructures it
-  const [count, setCount] = useState(10);
 
-  // ---------------------------
+  // useState returns an array. // const arr = useState(). But nobody write it like this, instead destructures the array like this.
+  const [count, setCount] = useState(10);
+  // we render the count and we have buttons that increment and decrement the count
+
+  // ---------------------------------------------------
+
+  // we can store anything in useState(). Here we are storing an object. And then we are destructuring that object and grabbing the numbers (number1 and number2)
+  // Lets say we want to increment the number here but we only want to increment the number2
+
   const [{number1, number2}, setNumber] = useState({number1: 10, number2: 20})
-  // --------------------------
+  // ----------------------------------------------------
+
   const [num1, setNum1] = useState(8);
   const [num2, setNum2] = useState(9);
-  // -------------------------
+
+  // ----------------------------------------------------
+  // How are the useState hooks useful - comes to defining your own custom logic and being able to extract this logic in the hook and use it all over the place
   // Forms
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  // use useForm hook
+
+  // How can we do this in a better way
+  // We can extract these above hooks into owr own custom hooks which handles the state for us
+  // Create useForm hook in useForm.js file
+  // use the useForm hook here
   const [values, handleChange] = useForm({email: "", password: "", firstName: ""})
 
   // ***************************************************************************************************
@@ -140,21 +158,30 @@ function App() {
 
   return (
     <div className="App">
+      <h2 style={{color: "red"}}>useState</h2>
       <p>Count: {count}</p>
       {/* Calling setCount on buttonclick */}
       <button onClick={() => setCount(count+1)}>Count +</button>
-      {/* Similar to setState() we can pass a function to setCount() */}
+
+      {/* Similar to setState() we can pass in a function to setCount() */}
+      {/* So insted of incrementing the count like above, we can pass an updater function */}
+      {/* It takes a single parameter (this is what the current state is, in this case count. We can also name it currentCount). And we return the new state from this updater function */}
+      {/* This is a great way to handle asynchronous state updates */}
       <button onClick={() => setCount(currentCount => currentCount - 1)}>Count -</button>
-      {/* --------------------------- */}
+
+      {/* -------------------------------------------------------------------- */}
       <hr/>
       <p>Number1: {number1}</p>
       <p>Number2: {number2}</p>
+      {/* the updator function onClick now needs to be fixed. The state is now an object */}
       {/* spread the current state (to retain other parts of the state) and then make changes to parts of the state */}
       <button onClick={() => setNumber(currentState => ({...currentState, number1: currentState.number1 + 1}))}>Number +</button>
       <br/>
       <p></p>
       <button onClick={() => setNumber(currentState => ({...currentState, number1: currentState.number1 + 1, number2: currentState.number2 + 5}))}>Both Number +</button>
-      {/* ------------------------------- */}
+
+      {/* ----------------------------------------------------------------------*/}
+
       <hr/>
       <p>Num1: {num1}</p>
       <p>Num2: {num2}</p>
@@ -164,18 +191,20 @@ function App() {
       <p></p>
       {/* To increment both of them */}
       <button onClick={() => {
-          setNum1(n => n+1);
-          setNum2(n => n+2)
-          }}
+        setNum1(n => n+1);
+        setNum2(n => n+2)
+      }}
       >Both Nums +</button> 
       <br/>
       <hr/>
-      {/* ------------ Forms ----------------- */}
+      {/* ------------------------------- Forms ------------------------------ */}
       
       <input ref={inputRef} type="email" placeholder="email" name="email" value={email} onChange={e => setEmail(e.target.value)} />
       <input type="password" placeholder="password" name="password" value={password} onChange={e => setPassword(e.target.value)} />
       <br/>
       <hr/>
+
+      <h2 style={{color: "red"}}>useState: useForm</h2>
       <input type="email" placeholder="email" name="email" value={values.email} onChange={handleChange} />
       <input type="password" placeholder="password" name="password" value={values.password} onChange={handleChange} />
       <input type="text" placeholder="first name" name="first name" value={values.firstName} onChange={handleChange} />
