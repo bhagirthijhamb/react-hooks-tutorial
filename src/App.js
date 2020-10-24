@@ -8,6 +8,7 @@ import { useFetch, useFetch1, useFetchh } from './useFetch';
 
 function expensiveInititalState(){
   // for loop etc
+  console.log('run function'); // is logged only the very first time the component is rendered, not on every subsequent rerenders( on clicks)
   return 10;
 }
 
@@ -17,28 +18,78 @@ function App() {
   //            useState Hook
   // ***************************************************************************************************
 
-  // useState() is used to define state. It can have as its first parameter the initial value that it is gonna store. 
+  // useState() is used to define state. It can have as its first parameter the initial value/default state that it is gonna store. 
   // eg. useState(10)
+
+  // In class components, we sett he state inside of the constructor, so the value of initial state (inside useState()) will only ever be run once. 
+  // But inside of function component the value inside useState() gets called everytime werun our function. (the App function)
+  // So if it was some realy complex computation inside useState(), if that would happen over an dover again every time we rendered our component, it could really slow down the performance of our application.
+  // That is why useState() has two ways to pass in the state
+  // First way is just the hard coded value like useState(10) and its gonna run everytime.
+  // Second way is it also takes the function version. What this does is it runs the function only the very first time your component renders
+
+  // const [count, setCount] = useState(expensiveInititalState())
+  // will run everytime
+  // const [count, setCount] = useState(() => expensiveInititalState())
+  // will run only once
+
   // or we can have a function that returns the initial value - useState(() => 10). We would want to do this if we have a computation that is very expensive.
 
   // This way it is called only first time, not every single time the component renders.
   // Only have this run on the initial value
   useState(() => expensiveInititalState());
 
-  // useState returns an array. // const arr = useState(). But nobody write it like this, instead destructures the array like this.
+  // useState() always returns an array with 2 values. // const arr = useState(). But nobody write it like this, instead destructures the array like this.
+  // First value is the current state (count)
+  // Second value is the function that is used to update the current state.
   const [count, setCount] = useState(10);
   // we render the count and we have buttons that increment and decrement the count
+
+  // const incrementCount = () => {
+  //   setCount(count + 1);
+  // }
+
+  // if we want to increase the value by 2 on a click
+  // The code below will increase the count by 1 only. Because the value of count here is the value of count when we render our function
+  // So we are calling setCount() of 10-1 two times. They are essentially overwriting each other.
+  // const incrementCount = () => {
+  //   setCount(count + 1);
+  //   setCount(count + 1);
+  // }
+
+  //  this can be solved by using updater function inside setCount()
+  
+  // const incrementCount = () => {
+  //   setCount(peviousCount => previousCount + 1);
+  //   setCount(peviousCount => previousCount + 1);
+  // }
+
+  // This is actualy incorrect way to update value based on previous value. As in class components there is a second version of setState() where we can pass a function to setState().
+  // Same way we can pass a function to setCount() and this function takes previous state value and returns the updated state value 
+
+  const incrementCount = () => {
+    setCount(previousCount => previousCount + 1);
+  }
 
   // ---------------------------------------------------
 
   // we can store anything in useState(). Here we are storing an object. And then we are destructuring that object and grabbing the numbers (number1 and number2)
   // Lets say we want to increment the number here but we only want to increment the number2
 
-  const [{number1, number2}, setNumber] = useState({number1: 10, number2: 20})
+  // const [state, setState] = useState({number1: 10, number2: 20, theme: 'blue'})
+  // const number1 = state.number1;
+  // const number2 = state.number2;
+  // const theme = state.theme;
+
+  const [{number1, number2, theme}, setNumber] = useState({number1: 3, number2: 4, theme: 'blue'})
+
+  // FIf we are using object inside of useState() as our state. For updating a part of this state, like for incrementing say number1 and keeping the other values unchanges, we have to return the state after spreading it and then updating the values we want to change.
+  // The reason the automatic merging does not happen it because in general when you are using a state inside of a hook like this, what we are going to do is actually have multiple state hooks like below
   // ----------------------------------------------------
 
   const [num1, setNum1] = useState(8);
   const [num2, setNum2] = useState(9);
+  const [themee, setThemee] = useState('blue');
 
   // ----------------------------------------------------
   // How are the useState hooks useful - comes to defining your own custom logic and being able to extract this logic in the hook and use it all over the place
@@ -211,7 +262,8 @@ function App() {
       <h2 style={{color: "red"}}>useState</h2>
       <p>Count: {count}</p>
       {/* Calling setCount on buttonclick */}
-      <button onClick={() => setCount(count+1)}>Count +</button>
+      {/* <button onClick={() => setCount(count+1)}>Count +</button> */}
+      <button onClick={incrementCount}>Count +</button>
 
       {/* Similar to setState() we can pass in a function to setCount() */}
       {/* So insted of incrementing the count like above, we can pass an updater function */}
@@ -221,11 +273,13 @@ function App() {
 
       {/* -------------------------------------------------------------------- */}
       <hr/>
-      <p>Number1: {number1}</p>
+      <p>Number1: <span>{number1}</span><span>{theme}</span></p>
       <p>Number2: {number2}</p>
       {/* the updator function onClick now needs to be fixed. The state is now an object */}
       {/* spread the current state (to retain other parts of the state) and then make changes to parts of the state */}
-      <button onClick={() => setNumber(currentState => ({...currentState, number1: currentState.number1 + 1}))}>Number +</button>
+
+      {/* <button onClick={() => setNumber(currentState => ({...currentState, number1: currentState.number1 + 1}))}>Number1 +</button> */}
+      <button onClick={() => setNumber(currentState => { return {...currentState, number1: currentState.number1 + 1}})}>Number1 +</button>
       <br/>
       <p></p>
       <button onClick={() => setNumber(currentState => ({...currentState, number1: currentState.number1 + 1, number2: currentState.number2 + 5}))}>Both Number +</button>
@@ -233,7 +287,7 @@ function App() {
       {/* ----------------------------------------------------------------------*/}
 
       <hr/>
-      <p>Num1: {num1}</p>
+      <p>Num1: <span>{num1}</span><span>{themee}</span></p>
       <p>Num2: {num2}</p>
       {/* Below will change just num1, won't change num2 */}
       <button onClick={() => setNum1(n => n+1)}>Num1 +</button> 
@@ -242,19 +296,21 @@ function App() {
       {/* To increment both of them */}
       <button onClick={() => {
         setNum1(n => n+1);
-        setNum2(n => n+2)
+        setNum2(n => n+2);
+        setThemee('red')
       }}
       >Both Nums +</button> 
       <br/>
       <hr/>
       {/* ------------------------------- Forms ------------------------------ */}
+      <h2>useState: form</h2>
       {/* useRef() used here in the input */}
       <input ref={inputRef} type="email" placeholder="email" name="email" value={email} onChange={e => setEmail(e.target.value)} />
       <input type="password" placeholder="password" name="password" value={password} onChange={e => setPassword(e.target.value)} />
       <br/>
       <hr/>
 
-      <h2 style={{color: "red"}}>useState: useForm</h2>
+      <h2 style={{color: "red"}}>useState: useForm Hook</h2>
       <input type="email" placeholder="email" name="email" value={values.email} onChange={handleChange} />
       <input type="password" placeholder="password" name="password" value={values.password} onChange={handleChange} />
       <input type="text" placeholder="first name" name="first name" value={values.firstName} onChange={handleChange} />
