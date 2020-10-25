@@ -107,7 +107,7 @@ function App() {
   //            useEffect Hook
   // ***************************************************************************************************
 
-  // Every time a component is rendered or it rerenders, the callback function inside the useEffect hook is called
+  // Every time a component is rendered or it rerenders, the callback function inside the useEffect hook is called.
     useEffect(() => {
       // console.log('render')
       // when we type in the input box, the component rerenders with each word typed and we see 'render' printed in the console.
@@ -115,13 +115,13 @@ function App() {
   // Everything else we do after this is for the callback function to be called less and to clean up after the render has happened.
   // If we want the function to be called less and. eg we dont want the function to be called on every render but only when we change the password.
   // We can do this by passing another argument to the useEffect as an array
-  // the second paranter is caled dependency array that we can pass in. Here we can pass in all the values that our useEffect depends on. These values when they change, the callback function fires off again.
+  // the second parameter is caled dependency array that we can pass in. Here we can pass in all the values that our useEffect depends on. These values when they change, the callback function fires off again.
   useEffect(() => {
     console.log('Second render')
     // when we type in the password input box, the component rerenders and we see 'render' printed in the console.
   }, [values.password])
   
-  // We can put more than one value here. eg if e have another field firstname.
+  // We can put more than one value here. eg if we have another field firstname.
   useEffect(() => {
     console.log('Third render');
   }, [values.email, values.password]);
@@ -152,10 +152,10 @@ function App() {
     // So we can see the component mounting and unmounting here
 
     //-----------------------------------------------------------------------
-    // the cool thing is that it doesnt have to be when the component mounts ans unmounts
+    // the cool thing is that it doesnt have to be when the component mounts and unmounts
     // lets say we want to fire off when the value of email input changes
     // So whenever the value in the email input chnages, its gonna call the cleanup function.
-    // So when we type a letter in the email input, we see unmount, we are unmounting we are just cleaning up the old value and we have a new value(letter) here.
+    // So when we type a letter in the email input, we see unmount, we are not unmounting we are just cleaning up the old value and we have a new value(letter) here.
     // First we see 'unmount...' and then 'mount...' because first it cleans up the old value and then we have 'mount...' for new value. (its not mounting or unmounting here. we can do this whenever the dependencies change)
     useEffect(() => {
       console.log('mount...')
@@ -183,7 +183,10 @@ function App() {
       }
     }, [])
 
-    // We can have more than one useEffect in a component ans they fire off in order
+    // We can have more than one useEffect in a component and they fire off in order
+    // Every time the useEffect hook runs, whatever is in the return gets run first to clean up whatever we did last time. So if you set up an event listener in useEffect() you wanna make sure your clean up code removes that so you dont constantly readd your event listener.
+    // If you subscribe to some API in useEffect, return should clean that up and unsubscribe from that API.
+    // Also this return gets called anytime your component unmounts
 
   //---------------------------------------------------------------------------
   // Fetch from an API
@@ -214,6 +217,68 @@ function App() {
     localStorage.setItem('countt', JSON.stringify(countt));
   }, [countt])
 
+  //--------------------------------------------------------------------------
+  // useEffect Hooks
+  // Depending on what resouce type we have selected (posts, comments, users), we want to query the JSONplaceholder API
+  // We want to set our code to react to when we change our resource type. We essentially want a side effect to happen when our resource type changes.
+  // In class components , we use the lifecycle methods for mounting and updating to create these different type of side effects.
+  // In function components we use useEfffect to say we want to do some form of side affect whe something happens.
+  const [resourceType, setResourceType] = useState('users');
+
+  // code inside useEffect gets executed everytime the application renders and rerenders(click of buttons)
+    // useEffect(() => {
+    //   console.log('resource render from useEffect');// printed out every time
+    // })
+
+  // This is kind of useful for doing certain kind of things everytime you render but more often than not you are gonna only want to do things when maybe your compoentnt mounts or when a specific resource on your page changes.
+  // to do that the second paranter to useEffect, an array. Whatever you pass to this array is going to be values that whenever they change your hook is going to run
+  console.log('render from resourse type compoenent')
+  useEffect(() => {
+      console.log('resource type changed');// printed out every time
+  }, [resourceType])
+
+  // So we can create something unique and createn a hook that only ever runs on mount by just passing an empty array.
+  // No matter what we do on our page, we will not get 'on mount' printed on console again. because the empty array never actualy changes between different renders.
+  useEffect(() => {
+    console.log('on mount');
+  }, [])
+
+  // So in our case we want to query the api when resource type chnages
+  // lets set the value that we recieve to some form of state (an empty array by default).
+  // Then we print that out. Click users, comments, posts to print different things. SO we modify our code and set new state based on the changes by just using the simple useEffect
+  const [items, setItems] = useState([])
+
+  useEffect(() => {
+    fetch(`https://jsonplaceholder.typicode.com/${resourceType}`)
+      .then((response) => response.json())
+      // .then((json) => console.log(json))
+      .then((json) => setItems(json))
+    }, [resourceType])
+
+  //--------------------------------------
+
+  // modify a variable based on the width of the window that we have open
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  // prints the current window width 
+  // resize the window width, the printed value does not change but when we refresh the browser it updates
+  // so we want to listen to the window resize event and modify this innerWidth variable.
+  // in class based components we would add event listener on mount and remove it on unmount.
+
+  const handleResize = () => {
+    setWindowWidth(window.innerWidth);
+  }
+
+  useEffect(() => {
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    }
+  }, [])
+
+  // the value updates because as soon as the component mounts it adds the event listener and we can dynamically update this value.
+  // we need to remove the event listener. we can do this clean up by returning a function and this function is called whenever this useEffect is cleaned up
 
   // ***************************************************************************************************
   //            useRef Hook
@@ -341,6 +406,22 @@ function App() {
       <div>{!dataa ? 'loading...' : dataa}</div>
       <div>count: {countt}</div>
       <button onClick={() => setCountt(c => c + 1)}>Increment</button>
+  <hr/>
+  {/* ------------------------------------------------------------------------ */}
+      <h2 style={{color: "green"}}>useEffect</h2>
+
+        <button onClick={() => setResourceType('posts')}>Posts</button>
+        <button onClick={() => setResourceType('users')}>Users</button>
+        <button onClick={() => setResourceType('comments')}>Comments</button>
+      <h3>{resourceType}</h3>
+        {items.map(item => {
+          return <pre>{JSON.stringify(item)}</pre>
+        })}
+
+  <hr/>
+  {/* ------------------------------------------------------------------------ */}
+      <h2 style={{color: "green"}}>useEffect</h2>
+      <div>{windowWidth}</div>
 
   {/* **************************************************************************************** */}
                       {/* useRef */}
