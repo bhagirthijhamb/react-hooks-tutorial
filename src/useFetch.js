@@ -8,7 +8,7 @@ export const useFetch = (url) => {
         fetch(url)
             .then(x => x.text())
             .then(y => {
-                console.log(y);
+                // console.log(y);
             });
                         // we can make a function make it asynchronous and call it like this
                         // const f = async() => {
@@ -32,7 +32,7 @@ export const useFetch = (url) => {
 // we can use multiple hooks in our custom hook
 export const useFetch1 = (url) => {
     const [state, setState] = useState({ data1: null, loading1: true });
-
+    
     useEffect(() => {
         // At the beginning dataa is set to null and loadingg is set to true
         setState(state => ({data1: state.data1, loading1: true}));

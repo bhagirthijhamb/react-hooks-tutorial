@@ -5,7 +5,7 @@ export const useForm = (initialValues) => {
     const [values, setValues] = useState(initialValues);
 
     // we can return stuff from my custom hooks. We can return an object or an arrray here (and patch the syntax of useState()). 
-    // First we return values and the an onChange function (that we can get handle for us)
+    // First we return values and an onChange function (that we can get handle for us)
     return [values, e => {
         setValues({
             ...values,

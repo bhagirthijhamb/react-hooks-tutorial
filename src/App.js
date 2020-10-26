@@ -1,14 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import { useForm } from "./useForm";
 import { Hello } from './Hello';
-import { Hi } from './Hi';
-import { ApiCall } from './ApiCall';
 import { useFetch, useFetch1, useFetchh } from './useFetch';
 
 function expensiveInititalState(){
   // for loop etc
-  console.log('run function'); // is logged only the very first time the component is rendered, not on every subsequent rerenders( on clicks)
+  // console.log('run function'); // is logged only the very first time the component is rendered, not on every subsequent rerenders( on clicks)
   return 10;
 }
 
@@ -21,9 +19,9 @@ function App() {
   // useState() is used to define state. It can have as its first parameter the initial value/default state that it is gonna store. 
   // eg. useState(10)
 
-  // In class components, we sett he state inside of the constructor, so the value of initial state (inside useState()) will only ever be run once. 
-  // But inside of function component the value inside useState() gets called everytime werun our function. (the App function)
-  // So if it was some realy complex computation inside useState(), if that would happen over an dover again every time we rendered our component, it could really slow down the performance of our application.
+  // In class components, we set the state inside of the constructor, so the value of initial state will only ever be run once. 
+  // But inside of function component the value inside useState() gets called everytime we run our function. (the App function)
+  // So if it was some realy complex computation inside useState(), if that would happen over and over again every time we rendered our component, it could really slow down the performance of our application.
   // That is why useState() has two ways to pass in the state
   // First way is just the hard coded value like useState(10) and its gonna run everytime.
   // Second way is it also takes the function version. What this does is it runs the function only the very first time your component renders
@@ -64,7 +62,7 @@ function App() {
   //   setCount(peviousCount => previousCount + 1);
   // }
 
-  // This is actualy incorrect way to update value based on previous value. As in class components there is a second version of setState() where we can pass a function to setState().
+  // This is actually incorrect way to update value based on previous value. As in class components there is a second version of setState() where we can pass a function to setState().
   // Same way we can pass a function to setCount() and this function takes previous state value and returns the updated state value 
 
   const incrementCount = () => {
@@ -83,7 +81,7 @@ function App() {
 
   const [{number1, number2, theme}, setNumber] = useState({number1: 3, number2: 4, theme: 'blue'})
 
-  // FIf we are using object inside of useState() as our state. For updating a part of this state, like for incrementing say number1 and keeping the other values unchanges, we have to return the state after spreading it and then updating the values we want to change.
+  // If we are using object inside of useState() as our state. For updating a part of this state, like for incrementing say number1 and keeping the other values unchanges, we have to return the state after spreading it and then updating the values we want to change.
   // The reason the automatic merging does not happen it because in general when you are using a state inside of a hook like this, what we are going to do is actually have multiple state hooks like below
   // ----------------------------------------------------
 
@@ -93,6 +91,7 @@ function App() {
 
   // ----------------------------------------------------
   // How are the useState hooks useful - comes to defining your own custom logic and being able to extract this logic in the hook and use it all over the place
+
   // Forms
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -107,7 +106,7 @@ function App() {
   //            useEffect Hook
   // ***************************************************************************************************
 
-  // Every time a component is rendered or it rerenders, the callback function inside the useEffect hook is called.
+  // Main use of useEffect hook - Every time a component is rendered or it rerenders, the callback function inside the useEffect hook is called.
     useEffect(() => {
       // console.log('render')
       // when we type in the input box, the component rerenders with each word typed and we see 'render' printed in the console.
@@ -117,14 +116,15 @@ function App() {
   // We can do this by passing another argument to the useEffect as an array
   // the second parameter is caled dependency array that we can pass in. Here we can pass in all the values that our useEffect depends on. These values when they change, the callback function fires off again.
   useEffect(() => {
-    console.log('Second render')
+    // console.log('Second render')
     // when we type in the password input box, the component rerenders and we see 'render' printed in the console.
   }, [values.password])
   
   // We can put more than one value here. eg if we have another field firstname.
   useEffect(() => {
-    console.log('Third render');
+    // console.log('Third render');
   }, [values.email, values.password]);
+
   // SO now my useEffect depends on email and password but not the firstname
   // This does a shallow comparison of the values, whenever the values change the function is called.
   // Shallow comparison means if we put an object [values] the object is going to change on every single change or a new object is going to be created so the function is gona be called every single time.
@@ -132,16 +132,16 @@ function App() {
   //---------------------------------------------------------------
   // We can replace componentDidMount and componentWillUnmount with useEffect hook
     useEffect(() => {
-      console.log('print once')
+      // console.log('print once')
       // Will log just once during first render of component when it mounts, that it. Doing renrenders in not gonna call the function there (try typing in the input boxes, it will not type in the console.)
     }, []) 
 
     // we can do a cleanup function which means we can return that function from the inside of the function inside of useEffect(). The returned function is called the cleanup function and we can add the cleanup logic here.
     useEffect(() => {
-      console.log('print once')
+      // console.log('print once')
       
       return () => {
-        console.log('unmount')
+        // console.log('unmount')
         // we see this when the component disappears(for a fraction of a second)
       }
     }, [])
@@ -153,19 +153,21 @@ function App() {
 
     //-----------------------------------------------------------------------
     // the cool thing is that it doesnt have to be when the component mounts and unmounts
+
     // lets say we want to fire off when the value of email input changes
     // So whenever the value in the email input chnages, its gonna call the cleanup function.
     // So when we type a letter in the email input, we see unmount, we are not unmounting we are just cleaning up the old value and we have a new value(letter) here.
     // First we see 'unmount...' and then 'mount...' because first it cleans up the old value and then we have 'mount...' for new value. (its not mounting or unmounting here. we can do this whenever the dependencies change)
     useEffect(() => {
-      console.log('mount...')
+      // console.log('mount from email...')
       
       return () => {
-        console.log('unmount...')
+        // console.log('unmount from email...')
       }
     }, [values.email])
     
     //-----------------------------------------------------------------------
+
     // Usecases example of this - EVENTS 
     // useEffect is a great place to add event listeners
 
@@ -196,7 +198,8 @@ function App() {
   useFetch('http://numbersapi.com/43/trivia');
   
   // lets make this more useful. i want this to return to me the data and loading (true/false whether the data is loading or not (whether there is anything in the data))
-  // How do we do this. We can combine the useFetch hook with useState hook (go to useFetch.js)
+  // How do we do this? 
+  // We can combine the useFetch hook with useState hook to store some information (go to useFetch.js)
   const {data1, loading1} = useFetch1('http://numbersapi.com/43/trivia')
   
   // next we want the data to change whenever the url changes
@@ -219,10 +222,11 @@ function App() {
 
   //--------------------------------------------------------------------------
   // useEffect Hooks
+
   // Depending on what resouce type we have selected (posts, comments, users), we want to query the JSONplaceholder API
   // We want to set our code to react to when we change our resource type. We essentially want a side effect to happen when our resource type changes.
   // In class components , we use the lifecycle methods for mounting and updating to create these different type of side effects.
-  // In function components we use useEfffect to say we want to do some form of side affect whe something happens.
+  // In function components we use useEffect to say we want to do some form of side affect when something happens.
   const [resourceType, setResourceType] = useState('users');
 
   // code inside useEffect gets executed everytime the application renders and rerenders(click of buttons)
@@ -231,16 +235,16 @@ function App() {
     // })
 
   // This is kind of useful for doing certain kind of things everytime you render but more often than not you are gonna only want to do things when maybe your compoentnt mounts or when a specific resource on your page changes.
-  // to do that the second paranter to useEffect, an array. Whatever you pass to this array is going to be values that whenever they change your hook is going to run
-  console.log('render from resourse type compoenent')
+  // to do that the second paramter to useEffect, an array. Whatever you pass to this array is going to be values that whenever they change your hook is going to run
+  // console.log('render from resourse type compoenent')
   useEffect(() => {
-      console.log('resource type changed');// printed out every time
+      // console.log('resource type changed');// printed out every time
   }, [resourceType])
 
   // So we can create something unique and createn a hook that only ever runs on mount by just passing an empty array.
   // No matter what we do on our page, we will not get 'on mount' printed on console again. because the empty array never actualy changes between different renders.
   useEffect(() => {
-    console.log('on mount');
+    // console.log('on mount');
   }, [])
 
   // So in our case we want to query the api when resource type chnages
@@ -280,48 +284,7 @@ function App() {
   // the value updates because as soon as the component mounts it adds the event listener and we can dynamically update this value.
   // we need to remove the event listener. we can do this clean up by returning a function and this function is called whenever this useEffect is cleaned up
 
-  // ***************************************************************************************************
-  //            useRef Hook
-  // ***************************************************************************************************
-
-  // Use case - for storing a reference to a component say input field or div and then being able to reference that node in your application
-  // so we will make a button and whenever we click that button it will focus the input field. So we will get reference to them
-
-  const inputRef = useRef(); // create a new variable and use useRef() here
-  // we can pass this to what ever component we want to get reference of (first email input here)
-  // So we want a reference to the input field now, so we pass it to the input field. So we console.log(inputRef.current) and we have refernce to the input DOM node and we can do what ever we want. Like call any methods on there or read the values of the stuff
-  // we say inputRef.current.focus()
-
-  //--------------------------------------------------------------
-  // Usecase - Store number of times a component has rendered
-  // useRef() can be used with anything you want to store the reference for. It doesnt have to be necessarily a DOM node. It can be an integer also
-  // Lets create another component 
   
-  const [showHi, setShowHi] = useState(true);
-  //--------------------------------------------------------------
-  // Another usecase is with useFetch. So its helpful to know whether a component has unmounted, so we can prevent an error when we are trying setting state on our component that has been unmounted.
-  // we create another component ApiCall.js
-
-  const [showApiCall, setShowApiCall] = useState(true);
-
-  // If we increment the counter, the apicall takes some time to return (because of setTimeout), If we toggle the component off at this time, its gonna try to update the state when the component is gone and we get this error
-  /*
-  Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
-    at ApiCall (http://localhost:3000/static/js/main.chunk.js:43:85)
-  */
-  // We try caling setState() when the component is gone
-  // So we can use reference ot help solve this problem. In useFetch.js hook
-
-  // So now if we increment and we toggle the component off, when the data loads its not longer going to cal setState because the current value is false.
-
-  //-------------------------------------------------
-  // lets use useRef() with functions
-  const hello = useRef(() => {
-      console.log('hello')
-  })
-  // lets put this hello reference on the focus button we made earlier.
-  // So now when we click focus button, it focuses the email input and logs 'hello' to the console.
-
   return (
     <div className="App">
       <h2 style={{color: "red"}}>useState</h2>
@@ -370,7 +333,7 @@ function App() {
       {/* ------------------------------- Forms ------------------------------ */}
       <h2>useState: form</h2>
       {/* useRef() used here in the input */}
-      <input ref={inputRef} type="email" placeholder="email" name="email" value={email} onChange={e => setEmail(e.target.value)} />
+      <input type="email" placeholder="email" name="email" value={email} onChange={e => setEmail(e.target.value)} />
       <input type="password" placeholder="password" name="password" value={password} onChange={e => setPassword(e.target.value)} />
       <br/>
       <hr/>
@@ -402,6 +365,7 @@ function App() {
 
       <hr/>
 
+        {/* For jitter change this to that */}
       {/* <div>{loadingg ? 'loading...' : dataa}</div> */}
       <div>{!dataa ? 'loading...' : dataa}</div>
       <div>count: {countt}</div>
@@ -423,29 +387,7 @@ function App() {
       <h2 style={{color: "green"}}>useEffect</h2>
       <div>{windowWidth}</div>
 
-  {/* **************************************************************************************** */}
-                      {/* useRef */}
-  {/* ************************************************************************************** */}
   
-      <br/><hr/>
-    <h2 style={{color: "blue"}}>useRef</h2>
-
-      <button onClick={() => {
-        console.log(inputRef.current);
-        inputRef.current.focus();
-        hello.current();
-      }}>Focus</button>
-
-      {/* conditionally render Hi component */}
-      {showHi && <Hi />}
-      {/* button to toggle it on and off */}
-      <button onClick={() => setShowHi(!showHi)}>toggle</button>
-      <hr/>
-
-      <div style={{color:"blue"}}>ApiCall output</div>
-      {showApiCall && <ApiCall />}
-      <button onClick={() => setShowApiCall(!showApiCall)}>Toggle ApiCall</button>
-
     </div>
   );
 }

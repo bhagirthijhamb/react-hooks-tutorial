@@ -2,10 +2,10 @@ import React from 'react';
 
 export const Hello = () => {
     React.useEffect(() => {
-        console.log("render");
+        // console.log("render from Hello");
 
         return () => {
-            console.log("unmount");
+            // console.log("unmount from Hello");
         };
     }, []);
 
